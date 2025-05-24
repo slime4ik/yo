@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Предложения обмена</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .filters {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .filter-group {
+            margin-bottom: 10px;
+        }
+        .filter-button {
+            padding: 5px 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .proposal-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .proposal-status {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-accepted {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .proposal-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .action-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .accept-button {
+            background: #28a745;
+            color: white;
+        }
+        .reject-button {
+            background: #dc3545;
+            color: white;
+        }
+        .no-offers {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Предложения обмена для "{{ ad.title }}"</h1>
+    
+    <!-- Фильтры -->
+    <div class="filters">
+        <form method="get">
+            <div class="filter-group">
+                <label for="status">Статус:</label>
+                <select name="status" id="status">
+                    <option value="">Все</option>
+                    {% for value, name in status_choices %}
+                        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+                            {{ name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="sender">Отправитель:</label>
+                <input type="text" name="sender" id="sender" value="{{ request.GET.sender }}" placeholder="Имя пользователя">
+            </div>
+            
+            <button type="submit" class="filter-button">Фильтровать</button>
+            <a href="{% url 'offers' ad.id %}" class="filter-button">Сбросить</a>
+        </form>
+    </div>
+    
+    <!-- Список предложений -->
+    {% if proposals %}
+        {% for proposal in proposals %}
+        <div class="proposal-card">
+            <div class="proposal-header">
+                <div>
+                    <strong>{{ proposal.ad_sender.title }}</strong>
+                    <div>От: {{ proposal.ad_sender.user.username }}</div>
+                </div>
+                <div class="proposal-status status-{{ proposal.status }}">
+                    {{ proposal.get_status_display }}
+                </div>
+            </div>
+            
+            <div class="proposal-details">
+                <p>{{ proposal.comment|default:"Без комментария" }}</p>
+                <small>Дата: {{ proposal.created_at|date:"d.m.Y H:i" }}</small>
+            </div>
+            
+            {% if proposal.status == 'pending' %}
+            <div class="proposal-actions">
+                <form method="post" action="{% url 'accept_proposal' proposal.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="action-button accept-button">Принять</button>
+                </form>
+                <form method="post" action="{% url 'reject_proposal' proposal.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="action-button reject-button">Отклонить</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-offers">
+            <p>Нет предложений обмена</p>
+        </div>
+    {% endif %}
+</body>
+</html>

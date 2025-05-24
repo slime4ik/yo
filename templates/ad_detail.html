@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ ad.title }} - Детали объявления</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .ad-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .ad-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .ad-id {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        .ad-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #222;
+        }
+        .ad-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .ad-author {
+            color: #555;
+        }
+        .ad-time {
+            color: #888;
+            font-style: italic;
+        }
+        .ad-category {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #444;
+            margin-right: 10px;
+        }
+        .ad-condition {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .condition-new {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+        .condition-used {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .ad-description {
+            color: #555;
+            font-size: 16px;
+            line-height: 1.7;
+            margin: 25px 0;
+            white-space: pre-line;
+        }
+        .exchange-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 20px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .exchange-btn:hover {
+            background-color: #45a049;
+        }
+        .exchange-form {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .exchange-form select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .exchange-form button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .exchange-form button:hover {
+            background-color: #0b7dda;
+        }
+        .proposals-list {
+            margin-top: 30px;
+        }
+        .proposal {
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .proposal-actions {
+    margin-top: 10px;
+}
+
+.btn-accept {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-reject {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.proposal-status {
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.proposal-status.accepted {
+    color: #4CAF50;
+}
+
+.proposal-status.rejected {
+    color: #f44336;
+}
+.exchange-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.proposal-comment {
+    background: #f8f8f8;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+    border-left: 3px solid #ddd;
+}
+
+.proposal-comment p {
+    margin: 5px 0 0 0;
+    color: #555;
+}
+.proposal-status {
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.proposal-status.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.proposal-status.accepted {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.proposal-status.rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+    </style>
+</head>
+<body>
+    <div class="ad-container">
+        <div class="ad-header">
+            <div class="ad-id">Артикул: #{{ ad.id }}</div>
+            <h1 class="ad-title">{{ ad.title }}</h1>
+            <div class="ad-meta">
+                <span class="ad-author">Автор: {{ ad.user.username }}</span>
+                <span class="ad-time">Опубликовано: {{ ad.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            <div>
+                <span class="ad-category">{{ ad.category.name }}</span>
+                <span class="ad-condition {% if ad.condition == 'new' %}condition-new{% else %}condition-used{% endif %}">
+                    {{ ad.get_condition_display }}
+                </span>
+                {% if request.user == ad.user%}
+                    <button><a href='{% url 'edit' ad.id %}'>Редактировать обьявление</a></button>
+                    <form action="{% url 'delete' ad.id %}" method="post">
+                    {% csrf_token %}
+                        <button type="submit" class="action-btn manage-btn">
+                            <i class="fa-solid fa-trash"></i> Удалить обьявление
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="ad-description">
+            {{ ad.description }}
+        </div>
+        
+{% if can_propose_exchange %}
+<button id="exchangeBtn" class="exchange-btn">Предложить обмен</button>
+
+<div id="exchangeForm" class="exchange-form">
+    <h3>Выберите свой товар для обмена:</h3>
+    <form method="post" action="{% url 'create_trade' ad.id %}">
+        {% csrf_token %}
+        <select name="sender_ad" required>
+            {% for user_ad in user_ads %}
+            <option value="{{ user_ad.id }}">
+                {{ user_ad.title }} ({{ user_ad.get_condition_display }})
+            </option>
+            {% endfor %}
+        </select>
+        <textarea name="comment" placeholder="Ваш комментарий к предложению" rows="3"></textarea>
+        <button type="submit">Отправить предложение</button>
+    </form>
+</div>
+
+
+<script>
+    document.getElementById('exchangeBtn').addEventListener('click', function() {
+        const form = document.getElementById('exchangeForm');
+        form.style.display = form.style.display === 'block' ? 'none' : 'block';
+    });
+</script>
+{% endif %}
+    </div>
+<div class="proposals-list">
+    <h2>Предложений обмена ({{ ad.proposals_count }})</h2>
+    {% if request.user == ad.user %}
+    <a href='{% url 'offers' ad.id%}'>Просмотреть</a>
+    {% endif %}
+</div>
+</body>
+</html>
